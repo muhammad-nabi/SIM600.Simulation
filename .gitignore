@@ -482,3 +482,5 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+SIM600.Simulation/app.db
+SIM600.Simulation/appsettings.Development.json
