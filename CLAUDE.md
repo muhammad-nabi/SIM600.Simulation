@@ -8,8 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build the project
 dotnet build
 
-# Run the application (launches at http://localhost:5050 or https://localhost:7219)
+# Run the application
 dotnet run --project SIM600.Simulation
+# HTTP:  http://localhost:5050
+# HTTPS: https://localhost:7219
 
 # Restore dependencies
 dotnet restore
@@ -21,32 +23,26 @@ dotnet ef database update --project SIM600.Simulation
 
 ## Architecture
 
-This is an ASP.NET Core 9.0 MVC web application with ASP.NET Identity for authentication.
+ASP.NET Core 9.0 web application using a **hybrid MVC + Razor Pages** pattern:
+- **MVC Controllers** (`Controllers/`) - Main application pages
+- **Razor Pages** (`Areas/Identity/`) - Authentication flows (login, register, 2FA, account management)
 
-**Key Components:**
-- **Data/ApplicationDbContext.cs** - Entity Framework Core context extending IdentityDbContext, uses SQLite (app.db)
-- **Controllers/** - MVC controllers (currently HomeController)
-- **Views/** - Razor views with shared _Layout.cshtml master page
-- **Areas/Identity/** - Scaffolded ASP.NET Identity pages for authentication
-- **Program.cs** - Application configuration and middleware pipeline
+**Data Access:** Entity Framework Core 9.0 with SQLite (`app.db`). Migrations in `Data/Migrations/`.
 
-**Data Access:** Entity Framework Core 9.0 with SQLite provider. Migrations are in `Data/Migrations/`.
+**Authentication:** ASP.NET Identity with:
+- Email confirmation required (`RequireConfirmedAccount = true`)
+- Two-factor authentication via authenticator apps (TOTP)
+- QR code generation for 2FA setup (`wwwroot/js/qr.js` using qrcodejs)
 
-**Authentication:** ASP.NET Identity with confirmed account requirement enabled.
+**Email:** SendGrid configured in `appsettings.Development.json`. Use User Secrets for production keys.
 
-## Project Structure
+## Key Files
 
-```
-SIM600.Simulation/
-├── Controllers/      # MVC controllers
-├── Models/           # View models and domain models
-├── Data/             # DbContext and EF migrations
-├── Views/            # Razor views organized by controller
-├── Areas/Identity/   # Identity UI scaffolding
-├── wwwroot/          # Static assets (Bootstrap, jQuery, site.css/js)
-└── Program.cs        # App entry point and configuration
-```
+- `Program.cs` - DI configuration, middleware pipeline
+- `Data/ApplicationDbContext.cs` - EF Core context (extends IdentityDbContext)
+- `Views/Shared/_Layout.cshtml` - Master layout with navbar
+- `Areas/Identity/Pages/Account/Manage/EnableAuthenticator.cshtml` - 2FA setup with QR code
 
 ## Testing
 
-No test projects currently exist. When adding tests, use xUnit with the standard .NET test patterns.
+No test projects currently exist. When adding tests, use xUnit.
