@@ -23,11 +23,11 @@ dotnet ef database update --project SIM600.Simulation
 
 ## Architecture
 
-ASP.NET Core 9.0 web application using a **hybrid MVC + Razor Pages** pattern:
+ASP.NET Core 10.0 web application using a **hybrid MVC + Razor Pages** pattern:
 - **MVC Controllers** (`Controllers/`) - Main application pages
 - **Razor Pages** (`Areas/Identity/`) - Authentication flows (login, register, 2FA, account management)
 
-**Data Access:** Entity Framework Core 9.0 with SQLite (`app.db`). Migrations in `Data/Migrations/`.
+**Data Access:** Entity Framework Core 10.0 with SQLite (`app.db`). Migrations in `Data/Migrations/`.
 
 **Authentication:** ASP.NET Identity with:
 - Email confirmation required (`RequireConfirmedAccount = true`)

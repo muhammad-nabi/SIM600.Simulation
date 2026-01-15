@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C#: SIM600.Simulation [https]",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/SIM600.Simulation/bin/Debug/net10.0/SIM600.Simulation.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/SIM600.Simulation",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "https://localhost:7219;http://localhost:5050"
+            }
+        },
+        {
+            "name": "C#: SIM600.Simulation [http]",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/SIM600.Simulation/bin/Debug/net10.0/SIM600.Simulation.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/SIM600.Simulation",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5050"
+            }
+        }
+    ]
+}
