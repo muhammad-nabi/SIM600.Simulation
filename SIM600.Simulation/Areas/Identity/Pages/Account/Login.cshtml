@@ -43,6 +43,14 @@
                         <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
                     </p>
                 </div>
+                <div class="mt-4">
+                    <hr />
+                    <p class="text-center text-muted">Or</p>
+                    <a asp-page="./RequestMagicLink" asp-route-returnUrl="@Model.ReturnUrl"
+                       class="btn btn-outline-secondary w-100">
+                        Sign in with email link
+                    </a>
+                </div>
             </form>
         </section>
     </div>

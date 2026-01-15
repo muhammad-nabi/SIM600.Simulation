@@ -1,0 +1,24 @@
+@page
+@model LoginWithMagicLinkModel
+
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.StatusMessage
+    </div>
+
+    <div class="mt-3">
+        <p>
+            <a asp-page="./RequestMagicLink" asp-route-returnUrl="@Model.ReturnUrl">Request a new sign-in link</a>
+        </p>
+        <p>
+            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Back to login</a>
+        </p>
+    </div>
+}

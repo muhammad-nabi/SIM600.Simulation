@@ -1,0 +1,25 @@
+@page
+@model RequestMagicLinkConfirmationModel
+
+@{
+    ViewData["Title"] = "Check your email";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    If an account exists for that email address and it has been confirmed, we've sent a sign-in link.
+    Please check your email and click the link to sign in.
+</p>
+<p>
+    The link will expire in 15 minutes and can only be used once.
+</p>
+
+<div class="mt-3">
+    <p>
+        <a asp-page="./RequestMagicLink" asp-route-returnUrl="@Model.ReturnUrl">Request another link</a>
+    </p>
+    <p>
+        <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Back to login</a>
+    </p>
+</div>
