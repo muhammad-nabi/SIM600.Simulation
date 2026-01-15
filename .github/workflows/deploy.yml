@@ -29,6 +29,20 @@ jobs:
     - name: Publish
       run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --no-build --output publish
 
+    # 🔹 BACKUP PRODUCTION FILES
+    - name: Backup production config and database
+      run: |
+        # Backup production config
+        if [ -f ${{ env.DEPLOY_PATH }}/appsettings.Production.json ]; then
+          sudo cp ${{ env.DEPLOY_PATH }}/appsettings.Production.json /tmp/appsettings.Production.json.bak
+          echo "✅ Production config backed up"
+        fi
+        # Backup SQLite database
+        if [ -f ${{ env.DEPLOY_PATH }}/app.db ]; then
+          sudo cp ${{ env.DEPLOY_PATH }}/app.db /tmp/app.db.bak
+          echo "✅ Database backed up"
+        fi
+
     # 🔹 BACKUP CURRENT DEPLOYMENT
     - name: Backup current app
       run: |
@@ -43,6 +57,24 @@ jobs:
       run: |
         sudo cp -r publish/* ${{ env.DEPLOY_PATH }}/
         sudo chown -R www-data:www-data ${{ env.DEPLOY_PATH }}
+
+    # 🔹 RESTORE PRODUCTION FILES
+    - name: Restore production config and database
+      run: |
+        # Restore production config
+        if [ -f /tmp/appsettings.Production.json.bak ]; then
+          sudo cp /tmp/appsettings.Production.json.bak ${{ env.DEPLOY_PATH }}/appsettings.Production.json
+          sudo chown www-data:www-data ${{ env.DEPLOY_PATH }}/appsettings.Production.json
+          sudo rm /tmp/appsettings.Production.json.bak
+          echo "✅ Production config restored"
+        fi
+        # Restore SQLite database
+        if [ -f /tmp/app.db.bak ]; then
+          sudo cp /tmp/app.db.bak ${{ env.DEPLOY_PATH }}/app.db
+          sudo chown www-data:www-data ${{ env.DEPLOY_PATH }}/app.db
+          sudo rm /tmp/app.db.bak
+          echo "✅ Database restored"
+        fi
 
     # 🔹 RESTART APP
     - name: Restart service
