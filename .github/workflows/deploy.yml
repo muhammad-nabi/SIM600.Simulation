@@ -17,10 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+    - name: Verify .NET installation
+      run: dotnet --version
 
     - name: Restore dependencies
       run: dotnet restore ${{ env.PROJECT_PATH }}
