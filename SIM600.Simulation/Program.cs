@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using SIM600.Simulation.Data;
+using SIM600.Simulation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,11 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// Configure Azure Email Settings
+builder.Services.Configure<AzureEmailOptions>(
+    builder.Configuration.GetSection(AzureEmailOptions.SectionName));
+builder.Services.AddTransient<IEmailSender, AzureEmailSender>();
 
 var app = builder.Build();
 
