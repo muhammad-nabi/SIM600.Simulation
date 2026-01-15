@@ -1,0 +1,119 @@
+name: Deploy ASP.NET Core MVC to Azure VM
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT_PATH: 'SIM600.Simulation/SIM600.Simulation.csproj'
+  APP_NAME: 'mvcapp'
+  DEPLOY_PATH: '/home/azureuser/mvcapp/'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --no-build --output publish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-package
+        path: publish/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: app-package
+        path: publish/
+
+    # 🔹 BACKUP CURRENT DEPLOYMENT
+    - name: Backup current app on VM
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          if [ -d ${{ env.DEPLOY_PATH }} ]; then
+            rm -rf ${{ env.DEPLOY_PATH }}_prev
+            mv ${{ env.DEPLOY_PATH }} ${{ env.DEPLOY_PATH }}_prev
+          fi
+          mkdir -p ${{ env.DEPLOY_PATH }}
+
+    # 🔹 COPY NEW BUILD
+    - name: Deploy to VM
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        source: "publish/*"
+        target: ${{ env.DEPLOY_PATH }}
+        strip_components: 1
+
+    # 🔹 RESTART APP
+    - name: Restart service
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: sudo systemctl restart ${{ env.APP_NAME }}
+
+    # 🔹 HEALTH CHECK
+    - name: Verify deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          sleep 10
+          if systemctl is-active --quiet ${{ env.APP_NAME }}; then
+            echo "✅ Service is running"
+          else
+            echo "❌ Service failed to start"
+            sudo systemctl status ${{ env.APP_NAME }}
+            exit 1
+          fi
+
+    # 🔹 ROLLBACK ON FAILURE
+    - name: Rollback on failure
+      if: failure()
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          if [ -d ${{ env.DEPLOY_PATH }}_prev ]; then
+            echo "🔄 Rolling back to previous version..."
+            rm -rf ${{ env.DEPLOY_PATH }}
+            mv ${{ env.DEPLOY_PATH }}_prev ${{ env.DEPLOY_PATH }}
+            sudo systemctl restart ${{ env.APP_NAME }}
+            echo "✅ Rollback complete"
+          else
+            echo "⚠️ No previous version to rollback to"
+          fi
