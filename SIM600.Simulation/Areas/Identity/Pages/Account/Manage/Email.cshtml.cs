@@ -128,7 +128,7 @@ namespace SIM600.Simulation.Areas.Identity.Pages.Account.Manage
                     "Confirm your email",
                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                StatusMessage = "Confirmation link to change email sent. Please check your email. If you don't see the email, please check your junk or spam folder.";
                 return RedirectToPage();
             }
 
@@ -164,7 +164,7 @@ namespace SIM600.Simulation.Areas.Identity.Pages.Account.Manage
                 "Confirm your email",
                 $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            StatusMessage = "Verification email sent. Please check your email. If you don't see the email, please check your junk or spam folder.";
             return RedirectToPage();
         }
     }
